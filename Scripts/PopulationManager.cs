@@ -11,7 +11,7 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
         public GameObject botPrefab;
         public int populationSize = 50;
         List<GameObject> population = new List<GameObject>();
-        public static float elapsed = 0;
+        public static float elapsed = 5;
         public float trialTime = 5;
         int generation = 1;
 
@@ -22,9 +22,10 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
             guiStyle.normal.textColor = Color.white;
             GUI.BeginGroup(new Rect(10, 10, 250, 150));
             GUI.Box(new Rect(0, 0, 140, 140), "Stats", guiStyle);
-            GUI.Label(new Rect(10, 25, 200, 30), "Gen: " + generation, guiStyle);
-            GUI.Label(new Rect(10, 50, 200, 30), string.Format("Time: {0:0.00}", elapsed), guiStyle);
-            GUI.Label(new Rect(10, 75, 200, 30), "Population: " + population.Count, guiStyle);
+            GUI.Label(new Rect(10, 25, 200, 30), "Population Size: " + population.Count, guiStyle);
+            GUI.Label(new Rect(10, 50, 200, 30), "Gen: " + generation, guiStyle);
+            GUI.Label(new Rect(10, 75, 200, 30), string.Format("Time: {0:0.0}", elapsed), guiStyle);
+
             GUI.EndGroup();
         }
 
@@ -32,11 +33,12 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
         // Use this for initialization
         void Start()
         {
+            elapsed = trialTime;
             for (int i = 0; i < populationSize; i++)
             {
-                Vector3 startingPos = new Vector3(this.transform.position.x + Random.Range(-2, 2),
+                Vector3 startingPos = new Vector3(this.transform.position.x + Random.Range(-5.0f, 5.0f),
                                                     this.transform.position.y,
-                                                    this.transform.position.z + Random.Range(-2, 2));
+                                                    this.transform.position.z + Random.Range(-5.0f, 5.0f));
 
                 GameObject b = Instantiate(botPrefab, startingPos, this.transform.rotation);
                 b.GetComponent<Brain>().Init();
@@ -46,12 +48,12 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
 
         GameObject Breed(GameObject parent1, GameObject parent2)
         {
-            Vector3 startingPos = new Vector3(this.transform.position.x + Random.Range(-2, 2),
+            Vector3 startingPos = new Vector3(this.transform.position.x + Random.Range(-5.0f, 5.0f),
                                                     this.transform.position.y,
-                                                    this.transform.position.z + Random.Range(-2, 2));
+                                                    this.transform.position.z + Random.Range(-5.0f, 5.0f));
             GameObject offspring = Instantiate(botPrefab, startingPos, this.transform.rotation);
             Brain b = offspring.GetComponent<Brain>();
-            if (Random.Range(0, 100) == 1) //mutate 1 in 100
+            if (Random.Range(0, 6) == 1) //mutate 1 in 15
             {
                 b.Init();
                 b.dna.Mutate();
@@ -66,6 +68,7 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
 
         void BreedNewPopulation()
         {
+            elapsed = trialTime;
             List<GameObject> sortedList = population.OrderBy(o => o.GetComponent<Brain>().timeAlive).ToList();
 
             population.Clear();
@@ -82,13 +85,14 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
             generation++;
         }
 
+        // Update is called once per frame
         void Update()
         {
-            elapsed += Time.deltaTime;
-            if (elapsed >= trialTime)
+            elapsed -= Time.deltaTime;
+            if (elapsed <= 0)
             {
-                BreedNewPopulation();
                 elapsed = 0;
+                BreedNewPopulation();
             }
         }
     }

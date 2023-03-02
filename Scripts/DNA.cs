@@ -6,6 +6,7 @@ namespace MachineLearningBasic.SurvivalOfPopulation.Data
 {
     public class DNA
     {
+
         List<int> genes = new List<int>();
         int dnaLength = 0;
         int maxValues = 0;
